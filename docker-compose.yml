@@ -1,0 +1,33 @@
+services:
+  api:
+    build: .
+    container_name: studio_api
+    ports:
+      - "8000:8000"
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/services"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    networks:
+      - agent_network
+
+  agent:
+    build: .
+    container_name: studio_agent
+    environment:
+      - OLLAMA_HOST=http://host.docker.internal:11434
+      - API_URL=http://api:8000
+    command: python agent.py --test
+    depends_on:
+      api:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - agent_network
+
+networks:
+  agent_network:
+    driver: bridge
