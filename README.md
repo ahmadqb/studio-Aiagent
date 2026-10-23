@@ -1,4 +1,4 @@
-# waxcatAIagent
+
 
 # Studio Inquiry Assistant (fictional test data)
 
